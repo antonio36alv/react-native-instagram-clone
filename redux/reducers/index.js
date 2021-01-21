@@ -6,5 +6,5 @@ const Reducers = combineReducers(
         userState: user
     }
 )
-
+// HACER
 export default Reducers

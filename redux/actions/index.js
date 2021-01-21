@@ -1,5 +1,4 @@
-import { USER_STATE_CHANGE } from "../constants/index"
-// index here
+import { USER_STATE_CHANGE } from "../constants"
 import firebase from "firebase"
 
 export function fetchUser() {
@@ -10,7 +9,7 @@ export function fetchUser() {
                 .get()
                 .then(snapshot => {
                     if(snapshot.exists) {
-                        console.log(snapshot.data)
+                        console.log(snapshot.data())
                         dispatch(
                             { 
                                 type: USER_STATE_CHANGE,
