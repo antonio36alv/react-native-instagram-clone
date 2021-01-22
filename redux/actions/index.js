@@ -3,13 +3,13 @@ import firebase from "firebase"
 
 export function fetchUser() {
     return(dispatch => {
+        console.log("FUCKSICKLE830")
         firebase.firestore()
                 .collection("users")
                 .doc(firebase.auth().currentUser.uid)
                 .get()
                 .then(snapshot => {
                     if(snapshot.exists) {
-                        console.log(snapshot.data())
                         dispatch(
                             { 
                                 type: USER_STATE_CHANGE,

@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Text, View } from "react-native"
 
 import { connect } from "react-redux"
@@ -6,37 +6,35 @@ import { bindActionCreators } from "redux"
 import { fetchUser } from "../redux/actions/index"
 
 // export class Main extends Component {
-export function Main() {
-    // useEffect(() => {
-    //     fetchUser()
-    // }, [])
-    // componentDidMount() {
-        // this.props.fetchUser();
-        // const { currentUser } = this.props
-    // }
+export function Main(props) {
 
-    // const { currentUser } = this.props
-    // console.log(currentUser)
-    const [ currentUser, setCurrentUser ] = useState("")
-    // render() {
-        // const currentUser = "jawn"
+    const [ currentUser, setCurrentUser ] = useState({})
+
     useEffect(() => {
-
-        // currentUser = "jawn"
+        // const user = fetchUser()
+        // const USER = user()
+        // setCurrentUser(USER);
+        // const jawn = fetchUser()
+        const { fetchUser } = props
+        console.log(typeof fetchUser)
+        const user = fetchUser()
+        console.log(typeof user)
+        setCurrentUser(fetchUser())
+        // setCurrentUser(jibs)
     }, [])
 
+
     return(
+    
     currentUser === undefined ?
         <View>
             <Text>You here?</Text>
         </View>
         :
         <View style={{ flex: 1, justifyContent: "center" }}>
-          {/* <Text>{currentUser.name} is logged in</Text> */}
-          <Text>User is logged in</Text>
+          <Text>{currentUser.name} is logged in</Text>
         </View>
     )
-    // }
 }
 
 const mapStateToProps = (store) => ({
