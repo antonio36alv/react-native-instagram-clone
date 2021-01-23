@@ -1,40 +1,58 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Text, View } from "react-native"
 
 import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
 import { fetchUser } from "../redux/actions/index"
 
-// export class Main extends Component {
-export function Main(props) {
+// export function Main(props) {
+export class Main extends React.Component {
+    // const [ currentUser, setCurrentUser ] = useState({})
+    // useEffect(() => {
+    //     const ufck =props.fetchUser()
+    //     console.debug(ufck)
+    //     const { fetchUser } = props
+    //     // console.log(fff)
+    //     console.debug(fetchUser)
+    //     const shit = fetchUser()
+    //     console.debug(shit)
+    //     const { currentUser } = props
+    //     console.debug(currentUser)
+    //     setCurrentUser()
+    //     const jawn = props.fetchUser()
+    // }, [])
 
-    const [ currentUser, setCurrentUser ] = useState({})
+    // return(
+    // currentUser === undefined ?
+    //     <View>
+    //         <Text>You here?</Text>
+    //     </View>
+    //     :
+    //     <View style={{ flex: 1, justifyContent: "center" }}>
+    //       <Text>{currentUser.name} is logged in</Text>
+    //     </View>
+    // )
+    componentDidMount() {
+        this.props.fetchUser()
+    }
 
-    useEffect(() => {
-        // const user = fetchUser()
-        // const USER = user()
-        // setCurrentUser(USER);
-        // const jawn = fetchUser()
-        const { fetchUser } = props
-        console.log(typeof fetchUser)
-        const user = fetchUser()
-        console.log(typeof user)
-        setCurrentUser(fetchUser())
-        // setCurrentUser(jibs)
-    }, [])
+    render() {
+        const { currentUser } = this.props
 
+        return(
 
-    return(
-    
-    currentUser === undefined ?
-        <View>
-            <Text>You here?</Text>
-        </View>
-        :
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text>{currentUser.name} is logged in</Text>
-        </View>
-    )
+        currentUser == undefined ?
+
+            <View></View>
+
+            :
+
+            <View style={{ flex: 1, justifyContent: "center" }}>
+                <Text>{currentUser.name} is logged in</Text>
+            </View>
+        )
+    }
+
 }
 
 const mapStateToProps = (store) => ({
