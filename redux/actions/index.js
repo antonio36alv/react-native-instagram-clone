@@ -3,7 +3,6 @@ import firebase from "firebase"
 
 export function fetchUser() {
     return(dispatch => {
-        console.log("FUCKSICKLE830")
         firebase.firestore()
                 .collection("users")
                 .doc(firebase.auth().currentUser.uid)
