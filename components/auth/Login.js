@@ -9,7 +9,7 @@ export default function Login() {
 
     const onSignUp = () => {
 
-        firebase.auth().signInWithEmailAndPassword(email, password)
+        firebase.auth().signInWithEmailAndPassword(email.trim(), password)
             .then(res => {
                 console.log(`result\n${res}`)
             })
