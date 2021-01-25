@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, Image } from 'react-native';
 import { Camera } from 'expo-camera';
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
+  const [camera, setCamera] = useState(null);
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -19,12 +21,30 @@ export default function App() {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+
+  const takePicture = async () => {
+    if(camera) {
+        const data = await camera.takePictureAsync(null);
+        setImage(data.uri)
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
+
+        <View style={styles.cameraContainer}>
+          <Camera 
+            ref={ref => setCamera(ref)}
+            style={styles.fixedRatio} 
+            type={type} 
+            ratio={"1:1"} 
+          />
+        </View>
+
+        {/* <View style={styles.buttonContainer}> */}
+          <Button
             style={styles.button}
+            title="Flip Image"
             onPress={() => {
               setType(
                 type === Camera.Constants.Type.back
@@ -32,10 +52,9 @@ export default function App() {
                   : Camera.Constants.Type.back
               );
             }}>
-            <Text style={styles.text}> Flip </Text>
-          </TouchableOpacity>
-        </View>
-      </Camera>
+          </Button>
+          <Button title="Take Picture" onPress={() => takePicture()} />
+          {image && <Image source={{ uri: image }} style={styles.image} />}
     </View>
   );
 }
@@ -44,7 +63,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    camera: {
+    cameraContainer: {
+        flex: 1,
+        flexDirection: "row"
+    },
+    fixedRatio: {
+        flex: 1,
+        aspectRatio: 1
+    },
+    image: {
         flex: 1
     },
     buttonContainer: {
