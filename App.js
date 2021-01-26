@@ -5,15 +5,18 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { View, Text } from "react-native"
 import { Provider } from "react-redux"
 import { createStore, applyMiddleware } from "redux"
+
+import firebase from "firebase"
+import config from "./config"
+import rootReducer from "./redux/reducers"
+import thunk from "redux-thunk"
+
 import LandingScreen from "./components/auth/Landing"
 import RegisterScreen from "./components/auth/Register"
 import LoginScreen from "./components/auth/Login"
 import MainScreen from "./components/Main"
 import AddScreen from "./components/main/Add"
-import firebase from "firebase"
-import config from "./config"
-import rootReducer from "./redux/reducers"
-import thunk from "redux-thunk"
+import SaveScreen from "./components/main/Save"
 
 const store = createStore(rootReducer, applyMiddleware(thunk))
 
@@ -34,7 +37,7 @@ if(firebase.apps.length === 0) {
 
 const Stack = createStackNavigator();
 
-export default function App() {
+export default function App({ navigation }) {
 
   const [ loaded, setLoaded ] = useState(false);
   const [ loggedIn, setLoggedIn ] = useState(false);
@@ -43,6 +46,8 @@ export default function App() {
     setLoaded(true);
     firebase.auth().onAuthStateChanged(user => {
       user ? setLoggedIn(true) : setLoggedIn(false);
+      console.log("illuminiati")
+      console.log(Stack)
     });
   }, []);
 
@@ -70,7 +75,8 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Main">
             <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }}/>
-            <Stack.Screen name="Add" component={AddScreen} />
+            <Stack.Screen name="Add" component={AddScreen} navigation={ navigation } />
+            <Stack.Screen name="Save" component={SaveScreen} navigation={ navigation } />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
