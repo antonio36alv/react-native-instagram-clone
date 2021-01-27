@@ -46,8 +46,6 @@ export default function App({ navigation }) {
     setLoaded(true);
     firebase.auth().onAuthStateChanged(user => {
       user ? setLoggedIn(true) : setLoggedIn(false);
-      console.log("illuminiati")
-      console.log(Stack)
     });
   }, []);
 

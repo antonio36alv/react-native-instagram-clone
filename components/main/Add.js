@@ -77,7 +77,6 @@ export default function Add({ navigation }) {
           </Button>
           <Button title="Take Picture" onPress={() => takePicture()} />
           <Button title="Pick Image from Gallery" onPress={() => pickImage()} />
-          {/* <Button title="Save" onPress={() => NavigationPreloadManager.navigate("Save", {image})} /> */}
           <Button title="Save" onPress={() => navigation.navigate("Save", {image})} />
           {image && <Image source={{ uri: image }} style={styles.image} />}
     </View>
