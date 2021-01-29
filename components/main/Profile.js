@@ -1,29 +1,119 @@
-import React from 'react'
-import { StyleSheet, View, Text, Image, FlatList } from "react-native"
+import React, { useState, useEffect } from 'react'
+import { StyleSheet, View, Text, Image, FlatList, Button } from "react-native"
+
+import firebase from "firebase"
+require("firebase/firestore")
 
 import { connect } from "react-redux"
 
 function Profile(props) {
 
-    const { currentUser, posts } = props
-    console.log(currentUser)
-    console.log(posts)
+    const [ userPosts, setUserPosts ] = useState([])
+    const [ user, setUser ] = useState(null)
+    const [ following, setFollowing ] = useState(false)
+
+    useEffect(() => {
+
+        const { currentUser, posts } = props
+
+        if(props.route.params.uid === firebase.auth().currentUser.uid) {
+            setUser(currentUser)
+            setUserPosts(posts)
+        } else {
+
+            const uid = props.route.params.id
+
+            firebase.firestore()
+                    .collection("users")
+                    .doc(uid)
+                    .get()
+                    .then(snapshot => {
+                        if(snapshot.exists) {
+                            setUser(snapshot.data())
+                        } else {
+                            console.log("does not exist")
+                        }
+                    })
+            firebase.firestore()
+                    .collection("posts")
+                    .doc(uid)
+                    .collection("userPosts")
+                    .orderBy("creation", "asc")
+                    .get()
+                    .then(snapshot => {
+                        const posts = snapshot.docs.map(doc => {
+                            const data = doc.data()
+                            const id = doc.id;
+                            return { id, ...data }
+                        })
+                        setUser(posts)
+                    })
+        }
+
+    }, [ props.route.params.uid ])
+
+    const onUnfollow = () => {
+        console.log("unfollowing")
+        console.log(props.route.params.uid)
+        firebase.firestore()
+                .collection("following")
+                .doc(firebase.auth().currentUser.uid)
+                .collection("userFollowing")
+                .doc(props.route.params.uid)
+                .set({})
+    }
+
+    const follow = () => {
+        console.log("following")
+        console.log(props.route.params.uid)
+        firebase.firestore()
+                .collection("following")
+                .doc(firebase.auth().currentUser.uid)
+                .collection("userFollowing")
+                .doc(props.route.params.uid)
+                .delete()
+    }
+
+    if(user === null) {
+        return <View />
+    }
     return (
         <View style={styles.container}>
             <View style={styles.infoContainer}>
-                <Text>{currentUser.name}</Text>
-                <Text>{currentUser.email}</Text>
+                <Text>{user.name}</Text>
+                <Text>{user.email}</Text>
+                {props.route.params.uid !== firebase.auth().currentUser.uid
+                    ?
+                    (<View style={{ flex: 1}}>
+                        {following
+                            ?
+                            (<Button 
+                                style={styles.button}
+                                title="Following"
+                                onPress={() => onUnfollow()}
+                            />) 
+                            :
+                            (<Button 
+                                style={styles.button}
+                                title="Follow"
+                                onPress={() => follow()}
+                            />)
+                        }
+                    </View>)
+                    :
+                    null
+                }
             </View>
             <View style={styles.galleryContainer}>
                 <FlatList
                     numColumns={3}
                     horizontal={false}
-                    data={posts}
+                    data={userPosts}
                     renderItem={({item}) => (
                         <View style={styles.imageContainer}>
                             <Image
                                 style={styles.image}
-                                source={{ uri: item.snapshotURL}}
+                                source={{ uri: item.posts.snapshotURL}}
                             />
                         </View>
                     )}
@@ -39,6 +129,9 @@ const mapStateToProps = store => ({
 })
 
 const styles = StyleSheet.create({
+    button: {
+        color: "#2196f3"
+    },
     container: {
         flex: 1,
         marginTop: 40,

@@ -39,7 +39,7 @@ export default function Search({ navigation }) {
                 data={users}
                 renderItem={({item}) => (
                     <TouchableOpacity 
-                        onPress={() => navigation.navigate("Profile", { uid: item.uid })}
+                        onPress={() => navigation.navigate("Profile", { uid: item.id })}
                     >
                         <Text style={styles.userTextBox}>{item.name}</Text>
                     </TouchableOpacity>
