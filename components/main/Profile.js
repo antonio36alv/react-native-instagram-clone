@@ -11,8 +11,14 @@ function Profile(props) {
     const [ userPosts, setUserPosts ] = useState([])
     const [ user, setUser ] = useState(null)
     const [ following, setFollowing ] = useState(false)
+    const [ count, setCount ] = useState(0)
 
     useEffect(() => {
+
+        console.log("da babz")
+        console.log(props)
+        console.debug("count: " + count)
+        setCount(count + 1)
 
         const { currentUser, posts } = props
 
@@ -21,17 +27,19 @@ function Profile(props) {
             setUserPosts(posts)
         } else {
 
-            const uid = props.route.params.id
+            const uid = props.route.params.uid
 
             firebase.firestore()
                     .collection("users")
                     .doc(uid)
                     .get()
                     .then(snapshot => {
+                        console.debug(uid)
                         if(snapshot.exists) {
                             setUser(snapshot.data())
                         } else {
                             console.log("does not exist")
+                            console.log("profile.js")
                         }
                     })
             firebase.firestore()
@@ -46,15 +54,18 @@ function Profile(props) {
                             const id = doc.id;
                             return { id, ...data }
                         })
-                        setUser(posts)
+                        setUserPosts(posts)
                     })
         }
 
-    }, [ props.route.params.uid ])
+        props.following.indexOf(props.route.params.uid) > -1 ?
+            setFollowing(true)
+            :
+            setFollowing(false)
 
-    const onUnfollow = () => {
-        console.log("unfollowing")
-        console.log(props.route.params.uid)
+    }, [ props.route.params.uid, props.following ])
+
+    const follow = () => {
         firebase.firestore()
                 .collection("following")
                 .doc(firebase.auth().currentUser.uid)
@@ -63,9 +74,7 @@ function Profile(props) {
                 .set({})
     }
 
-    const follow = () => {
-        console.log("following")
-        console.log(props.route.params.uid)
+    const onUnfollow = () => {
         firebase.firestore()
                 .collection("following")
                 .doc(firebase.auth().currentUser.uid)
@@ -77,6 +86,7 @@ function Profile(props) {
     if(user === null) {
         return <View />
     }
+
     return (
         <View style={styles.container}>
             <View style={styles.infoContainer}>
@@ -84,7 +94,7 @@ function Profile(props) {
                 <Text>{user.email}</Text>
                 {props.route.params.uid !== firebase.auth().currentUser.uid
                     ?
-                    (<View style={{ flex: 1}}>
+                    (<View>
                         {following
                             ?
                             (<Button 
@@ -113,7 +123,7 @@ function Profile(props) {
                         <View style={styles.imageContainer}>
                             <Image
                                 style={styles.image}
-                                source={{ uri: item.posts.snapshotURL}}
+                                source={{ uri: item.snapshotURL}}
                             />
                         </View>
                     )}
@@ -123,14 +133,11 @@ function Profile(props) {
     )
 }
 
-const mapStateToProps = store => ({
-    currentUser: store.userState.currentUser,
-    posts: store.userState.posts
-})
-
 const styles = StyleSheet.create({
     button: {
-        color: "#2196f3"
+        color: "#2196f3",
+        // borderBottomColor: "black"
+        borderColor: "#20232a"
     },
     container: {
         flex: 1,
@@ -152,6 +159,12 @@ const styles = StyleSheet.create({
         // width: 50,
         // height: 50
     }
+})
+
+const mapStateToProps = store => ({
+    currentUser: store.userState.currentUser,
+    posts: store.userState.posts,
+    following: store.userState.following
 })
 
 export default connect(mapStateToProps, null)(Profile)
