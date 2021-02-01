@@ -11,14 +11,8 @@ function Profile(props) {
     const [ userPosts, setUserPosts ] = useState([])
     const [ user, setUser ] = useState(null)
     const [ following, setFollowing ] = useState(false)
-    const [ count, setCount ] = useState(0)
 
     useEffect(() => {
-
-        console.log("da babz")
-        console.log(props)
-        console.debug("count: " + count)
-        setCount(count + 1)
 
         const { currentUser, posts } = props
 
