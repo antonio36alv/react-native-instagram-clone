@@ -1,5 +1,11 @@
-import { USER_POSTS_STATE_CHANGE, USER_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE, USERS_POSTS_STATE_CHANGE } from "../constants"
+import { USER_POSTS_STATE_CHANGE, USER_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE, USERS_POSTS_STATE_CHANGE, CLEAR_DATA } from "../constants"
 import firebase from "firebase"
+
+export function clearData() {
+    return(dispatch => {
+        dispatch({ type: CLEAR_DATA })
+    })
+}
 
 export function fetchUser() {
     return(dispatch => {
@@ -89,8 +95,7 @@ export function fetchUsersData(uid) {
                                 user
                             }
                         )
-                        // dispatch(fetchUsersFollowingPosts(user.uid))
-                        dispatch(fetchUsersFollowingPosts(user.id))
+                        dispatch(fetchUsersFollowingPosts(user.uid))
                     } else {
                         console.log("does not exist")
                     }
@@ -110,15 +115,15 @@ export function fetchUsersFollowingPosts(uid) {
                 .then(snapshot => {
 
                     const uid = snapshot.query._.C_.Ft.path.segments[1]
-                    console.debug({snapshot, uid})
 
                     const user = getState().usersState.users.find(el => el.uid === uid);
 
-                    const posts = snapshot.docs.map(doc => {
+                    let posts = snapshot.docs.map(doc => {
                         const data = doc.data()
                         const id = doc.id;
                         return { id, ...data, user }
                     })
+                    console.log("should have exposed")
                     console.log(posts)
                     dispatch(
                         { 
