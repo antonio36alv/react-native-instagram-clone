@@ -22,20 +22,19 @@ function Profile(props) {
         } else {
 
             const uid = props.route.params.uid
+            console.log(`uid: ${uid}`)
 
             firebase.firestore()
                     .collection("users")
                     .doc(uid)
                     .get()
                     .then(snapshot => {
-                        console.debug(uid)
                         if(snapshot.exists) {
                             setUser(snapshot.data())
                         } else {
                             console.log("does not exist")
-                            console.log("profile.js")
                         }
-                    })
+                    }).catch(err => console.log("wtf right now"))
             firebase.firestore()
                     .collection("posts")
                     .doc(uid)
@@ -49,7 +48,7 @@ function Profile(props) {
                             return { id, ...data }
                         })
                         setUserPosts(posts)
-                    })
+                    }).catch(err => console.log(`error homie`))
         }
 
         props.following.indexOf(props.route.params.uid) > -1 ?

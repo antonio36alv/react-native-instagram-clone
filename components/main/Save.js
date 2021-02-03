@@ -31,7 +31,7 @@ export default function Save(props) {
             // console.log(`transferred: ${snapshot.bytesTransferred}`)
             task.snapshot.ref.getDownloadURL().then(snapshotURL => {
                 savePostData(snapshotURL)
-                console.log(snapshot)
+                // console.log(snapshot)
             })
         }
 

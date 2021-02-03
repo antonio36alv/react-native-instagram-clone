@@ -9,23 +9,40 @@ import { connect } from "react-redux"
 function Feed(props) {
 
     const [ posts, setPosts ] = useState([])
+    const [ count, setCount ] = useState(0)
 
     useEffect(() => {
-        console.log("pass the child myself if I had to")
-        console.log(props)
 
         let posts = []
         if(props.usersLoaded == props.following.length) {
-            props.following.forEach(following => {
-                const user = props.users.find(el => el.uid === following)
+            // props.following.forEach(following => {
+                // const user = props.users.find(el => el.uid === following)
+                // if(user != undefined) {
+                    // posts = [...posts, ...user.posts]
+                // }
+            // })
+            for(let x = 0; x < props.following.length; x++) {
+                const user = props.users.find(el => el.uid === props.following[x])
+
+                console.log(`${x + 1}`)
+                console.log("not a world")
+                console.log(user)
                 if(user != undefined) {
                     posts = [...posts, ...user.posts]
                 }
-            })
+            }
 
             posts.sort((x, y) => {
                 return x.creation - y.creation;
             })
+
+            console.log(`render/useEffect: #${count}`)
+            setCount(count + 1)
+            console.log("this is the only city...")
+            // console.log(posts)
+            // console.log(posts.snapshotURL)
+            posts.forEach(post => console.log(post.snapshotURL))
+            // console.log(posts.snapshotURL)
 
             setPosts(posts)
         }
@@ -44,7 +61,7 @@ function Feed(props) {
                             <Text styles={{ flex: 1}}>{item.user.name}</Text>
                             <Image
                                 style={styles.image}
-                                source={{ uri: item.snapshotURL}}
+                                source={{ uri: item.snapshotURL }}
                             />
                         </View>
                     )}
@@ -62,7 +79,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        marginTop: 40,
+        // marginTop: 40,
         // justifyContent: "center"
     },
     infoContainer: {
@@ -72,13 +89,13 @@ const styles = StyleSheet.create({
         flex: 1
     },
     imageContainer: {
-        flex: 1/3
+        flex: 1/1
     },
     image: {
         flex: 1,
         aspectRatio: 1/1,
-        // width: 50,
-        // height: 50
+        width: "auto",
+        height: "auto"
     }
 })
 
