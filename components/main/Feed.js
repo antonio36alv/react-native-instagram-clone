@@ -9,40 +9,21 @@ import { connect } from "react-redux"
 function Feed(props) {
 
     const [ posts, setPosts ] = useState([])
-    const [ count, setCount ] = useState(0)
 
     useEffect(() => {
 
         let posts = []
         if(props.usersLoaded == props.following.length) {
-            // props.following.forEach(following => {
-                // const user = props.users.find(el => el.uid === following)
-                // if(user != undefined) {
-                    // posts = [...posts, ...user.posts]
-                // }
-            // })
-            for(let x = 0; x < props.following.length; x++) {
-                const user = props.users.find(el => el.uid === props.following[x])
-
-                console.log(`${x + 1}`)
-                console.log("not a world")
-                console.log(user)
+            props.following.forEach(following => {
+                const user = props.users.find(el => el.uid === following)
                 if(user != undefined) {
                     posts = [...posts, ...user.posts]
                 }
-            }
+            })
 
             posts.sort((x, y) => {
                 return x.creation - y.creation;
             })
-
-            console.log(`render/useEffect: #${count}`)
-            setCount(count + 1)
-            console.log("this is the only city...")
-            // console.log(posts)
-            // console.log(posts.snapshotURL)
-            posts.forEach(post => console.log(post.snapshotURL))
-            // console.log(posts.snapshotURL)
 
             setPosts(posts)
         }
