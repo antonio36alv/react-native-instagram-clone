@@ -17,19 +17,45 @@ function Comment(props) {
     useEffect(() => {
 
         const matchUserToComment = comments => {
+        /*
             comments.forEach(comment => {
-                if(comment.hasOnProperty("user")) {
-                    return
-                }
+                if(!comment.hasOwnProperty("user")) {
+                    console.log("this did happen I saw something")
+                    // continue;
                 const user = props.users.find(x => x.uid === comment.creator)
                 user == undefined ?
                     props.fetchUsersData(comment.creator, false)
                     :
                     comment.user = user
+                    // return
+                }
+                //    comments.forEach(comment => {
+                    //    console.log("comment")
+                    //    console.log(comment)
+                //    })
             })
+            setComments(comments)
+        */
+            console.log(`but you can't even use a computer ${typeof props.users}`)
+            console.log(props.users)
+
+            for(let x = 0; x < comments.length; x++) {
+                if(comments[x].hasOwnProperty("user")) {
+                    continue;
+                }
+                const user = props.users.find(x => x.uid === comments[x].creator)
+
+                if(user == undefined) {
+                    props.fetchUsersData(comments[x].creator, false)
+                } else {
+                    comments[x].user = user
+                }
+            }
             setComments(comments)
         }
 
+        console.log("25 to 6 or 4")
+        console.log(props.route.params.postId)
         if(props.route.params.postId !== postId) {
             firebase.firestore()
                     .collection("posts")
@@ -50,7 +76,6 @@ function Comment(props) {
         } else {
             matchUserToComment(comments)
         }
-
     }, [ props.route.params.postId, props.users ])
 
     const submitComment = () => {
@@ -67,6 +92,7 @@ function Comment(props) {
     }
 
     return (
+        // <View style={{ flex: 1 }}>
         <View>
             <FlatList
                 numColumns={1}

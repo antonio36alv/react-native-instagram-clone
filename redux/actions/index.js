@@ -42,7 +42,7 @@ export function fetchUserPosts() {
                         const id = doc.id;
                         return { id, ...data }
                     })
-                    console.log(posts)
+                    // console.log(posts)
                     dispatch(
                         { 
                             type: USER_POSTS_STATE_CHANGE,
@@ -126,7 +126,7 @@ export function fetchUsersFollowingPosts(uid) {
                         return { id, ...data, user }
                     })
                     console.log("should have exposed")
-                    console.log(posts)
+                    // console.log(posts)
                     dispatch(
                         { 
                             type: USERS_POSTS_STATE_CHANGE,
