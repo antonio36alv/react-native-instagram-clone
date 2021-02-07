@@ -6,7 +6,7 @@ require("firebase/firestore")
 
 import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
-import { fetchUsersData } from "../../redux/actions"
+import { fetchUsersData } from "../../redux/actions/index"
 
 function Comment(props) {
 
@@ -36,14 +36,11 @@ function Comment(props) {
             })
             setComments(comments)
         */
-            console.log(`but you can't even use a computer ${typeof props.users}`)
-            console.log(props.users)
-
             for(let x = 0; x < comments.length; x++) {
                 if(comments[x].hasOwnProperty("user")) {
-                    continue;
+                    break;
                 }
-                const user = props.users.find(x => x.uid === comments[x].creator)
+                const user = props.users.find(user => user.uid === comments[x].creator)
 
                 if(user == undefined) {
                     props.fetchUsersData(comments[x].creator, false)
@@ -54,8 +51,9 @@ function Comment(props) {
             setComments(comments)
         }
 
-        console.log("25 to 6 or 4")
+        console.log("fuck it we'll do it live")
         console.log(props.route.params.postId)
+
         if(props.route.params.postId !== postId) {
             firebase.firestore()
                     .collection("posts")
@@ -76,6 +74,11 @@ function Comment(props) {
         } else {
             matchUserToComment(comments)
         }
+
+        console.log("infetterence")
+        console.log(comments.length)
+        console.log(`don't wanna go back to selling real estate: ${props.route.params.uid}`)
+
     }, [ props.route.params.postId, props.users ])
 
     const submitComment = () => {
@@ -98,16 +101,18 @@ function Comment(props) {
                 numColumns={1}
                 horizontal={false}
                 data={comments}
-                renderItem={({item}) => {
+                renderItem={({item}) => (
                     <View>
                         {item.user !== undefined ?
                             <Text>
                                 {item.user.name}
                             </Text>
-                            : null}
+                            // : null}
+                            :
+                            <Text>birds</Text>}
                         <Text>{item.text}</Text>
                     </View>
-                }}
+                )}
             />
 
             <View>
