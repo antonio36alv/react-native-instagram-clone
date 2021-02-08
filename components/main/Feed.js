@@ -39,7 +39,7 @@ function Feed(props) {
                     data={posts}
                     renderItem={({item}) => (
                         <View style={styles.imageContainer}>
-                            <Text styles={{ flex: 1}}>{item.user.name}</Text>
+                            <Text style={{ flex: 1}}>{item.user.name}</Text>
                             <Image
                                 style={styles.image}
                                 source={{ uri: item.snapshotURL }}

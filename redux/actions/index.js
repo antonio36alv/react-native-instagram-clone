@@ -1,5 +1,6 @@
 import { USER_POSTS_STATE_CHANGE, USER_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE, USERS_POSTS_STATE_CHANGE, CLEAR_DATA } from "../constants"
 import firebase from "firebase"
+require("firebase/firestore")
 
 export function clearData() {
     return(dispatch => {
@@ -78,10 +79,16 @@ export function fetchUserFollowing() {
 export function fetchUsersData(uid, getPosts) {
     return((dispatch, getState) => {
 
+        console.log(`wtf right now ${uid}`)
         const found = getState().usersState.users.some(el => el.uid === uid);
 
+        uid === undefined ?
+        console.log("undefined within fetchUsersData")
+        :
+        console.log(`barnacles ${uid}`)
+
         if(!found) {
-        firebase.firestore()
+            firebase.firestore()
                 .collection("users")
                 .doc(uid)
                 .get()
@@ -89,19 +96,14 @@ export function fetchUsersData(uid, getPosts) {
                     if(snapshot.exists) {
                         let user = snapshot.data();
                         user.uid = snapshot.id
-                        dispatch(
-                            { 
-                                type: USERS_DATA_STATE_CHANGE,
-                                user
-                            }
-                        )
+                        dispatch({ type: USERS_DATA_STATE_CHANGE, user });
                     } else {
                         console.log("does not exist")
                     }
-                    if(getPosts) {
-                        dispatch(fetchUsersFollowingPosts(uid))
-                    }
                 })
+                if(getPosts) {
+                    dispatch(fetchUsersFollowingPosts(uid))
+                }
         }
     })
 }

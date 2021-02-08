@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react"
 import { View, Text, FlatList, Button, TextInput } from "react-native"
 
 import firebase from "firebase"
@@ -9,107 +9,78 @@ import { bindActionCreators } from "redux"
 import { fetchUsersData } from "../../redux/actions/index"
 
 function Comment(props) {
-
-    const [ comments, setComments ] = useState([])
-    const [ postId, setPostId ] = useState("")
-    const [ commentText, setCommentText ] = useState("")
+    const [comments, setComments] = useState([])
+    const [postId, setPostId] = useState("")
+    const [text, setText] = useState("")
 
     useEffect(() => {
 
-        const matchUserToComment = comments => {
-        /*
-            comments.forEach(comment => {
-                if(!comment.hasOwnProperty("user")) {
-                    console.log("this did happen I saw something")
-                    // continue;
-                const user = props.users.find(x => x.uid === comment.creator)
-                user == undefined ?
-                    props.fetchUsersData(comment.creator, false)
-                    :
-                    comment.user = user
-                    // return
+        function matchUserToComment(comments) {
+            for (let i = 0; i < comments.length; i++) {
+                if (comments[i].hasOwnProperty("user")) {
+                    continue;
                 }
-                //    comments.forEach(comment => {
-                    //    console.log("comment")
-                    //    console.log(comment)
-                //    })
-            })
-            setComments(comments)
-        */
-            for(let x = 0; x < comments.length; x++) {
-                if(comments[x].hasOwnProperty("user")) {
-                    break;
-                }
-                const user = props.users.find(user => user.uid === comments[x].creator)
 
-                if(user == undefined) {
-                    props.fetchUsersData(comments[x].creator, false)
+                const user = props.users.find(x => x.uid === comments[i].creator)
+                if (user == undefined) {
+                    props.fetchUsersData(comments[i].creator, false)
                 } else {
-                    comments[x].user = user
+                    comments[i].user = user
                 }
             }
             setComments(comments)
         }
 
-        console.log("fuck it we'll do it live")
-        console.log(props.route.params.postId)
 
-        if(props.route.params.postId !== postId) {
+        if (props.route.params.postId !== postId) {
             firebase.firestore()
-                    .collection("posts")
-                    .doc(props.route.params.uid)
-                    .collection("userPosts")
-                    .doc(props.route.params.postId)
-                    .collection("comments")
-                    .get()
-                    .then(snapshot => {
-                        let comments = snapshot.docs.map(doc => {
-                            const data = doc.data()
-                            const id = doc.id
-                            return { id, ...data }
-                        })
-                        matchUserToComment(comments)
-                    })
-            setPostId(props.route.params.uid)
-        } else {
-            matchUserToComment(comments)
-        }
-
-        console.log("infetterence")
-        console.log(comments.length)
-        console.log(`don't wanna go back to selling real estate: ${props.route.params.uid}`)
-
-    }, [ props.route.params.postId, props.users ])
-
-    const submitComment = () => {
-        firebase.firestore()
                 .collection("posts")
                 .doc(props.route.params.uid)
                 .collection("userPosts")
                 .doc(props.route.params.postId)
                 .collection("comments")
-                .add({
-                    creator: firebase.auth().currentUser.uid,
-                    text: commentText
+                .get()
+                .then((snapshot) => {
+                    let comments = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        return { id, ...data }
+                    })
+                    matchUserToComment(comments)
                 })
+            setPostId(props.route.params.postId)
+        } else {
+            matchUserToComment(comments)
+        }
+    }, [props.route.params.postId, props.users])
+
+
+    const onCommentSend = () => {
+        firebase.firestore()
+            .collection("posts")
+            .doc(props.route.params.uid)
+            .collection("userPosts")
+            .doc(props.route.params.postId)
+            .collection("comments")
+            .add({
+                creator: firebase.auth().currentUser.uid,
+                text
+            })
     }
 
     return (
-        // <View style={{ flex: 1 }}>
         <View>
             <FlatList
                 numColumns={1}
                 horizontal={false}
                 data={comments}
-                renderItem={({item}) => (
-                    <View>
+                renderItem={({ item }) => (
+                    <View style={{ marginBottom: 2, marginTop: 2 }}>
                         {item.user !== undefined ?
-                            <Text>
+                            <Text style={{ color: "red" }}>
                                 {item.user.name}
                             </Text>
-                            // : null}
-                            :
-                            <Text>birds</Text>}
+                            : null}
                         <Text>{item.text}</Text>
                     </View>
                 )}
@@ -118,21 +89,21 @@ function Comment(props) {
             <View>
                 <TextInput
                     placeholder="comment..."
-                    onChangeText={(text) => setCommentText(text)}
-                />
-                <Button 
-                    onPress={() => submitComment()}
+                    onChangeText={(text) => setText(text)} />
+                <Button
+                    onPress={() => onCommentSend()}
                     title="Send"
                 />
             </View>
+
         </View>
     )
 }
 
+
 const mapStateToProps = (store) => ({
     users: store.usersState.users
 })
+const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch);
 
-const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUsersData }, dispatch)
-
-export default connect(mapStateToProps, mapDispatchProps)(Comment)
+export default connect(mapStateToProps, mapDispatchProps)(Comment);
