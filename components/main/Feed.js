@@ -12,23 +12,40 @@ function Feed(props) {
 
     useEffect(() => {
 
-        let posts = []
-        if(props.usersFollowingLoaded == props.following.length) {
-            props.following.forEach(following => {
-                const user = props.users.find(el => el.uid === following)
-                if(user != undefined) {
-                    posts = [...posts, ...user.posts]
-                }
-            })
+        if(props.usersFollowingLoaded == props.following.length && props.following.length != 0) {
 
-            posts.sort((x, y) => {
+            props.feed.sort((x, y) => {
                 return x.creation - y.creation;
             })
 
-            setPosts(posts)
+            setPosts(props.feed)
         }
+        console.log(posts)
 
-    }, [ props.usersFollowingLoaded ])
+    }, [ props.usersFollowingLoaded, props.feed ])
+
+    const onLike = (userId, postId) => {
+        firebase.firestore()
+                .collection("posts")
+                .doc(userId)
+                .collection("userPosts")
+                .doc(postId)
+                .collection("likes")
+                .doc(firebase.auth().currentUser.uid)
+                .set({})
+    }
+
+    const onUnlike = (userId, postId) => {
+        console.log("we are here")
+        firebase.firestore()
+                .collection("posts")
+                .doc(userId)
+                .collection("userPosts")
+                .doc(postId)
+                .collection("likes")
+                .doc(firebase.auth().currentUser.uid)
+                .delete()
+    }
 
     return (
         <View style={styles.container}>
@@ -44,6 +61,17 @@ function Feed(props) {
                                 style={styles.image}
                                 source={{ uri: item.snapshotURL }}
                             />
+                            {item.currentUserLike ? 
+                                <Button
+                                    title="Dislike"
+                                    onPress={() => onUnlike(item.user.uid, item.id)}
+                                />
+                                :
+                                <Button 
+                                    title="Like"
+                                    onPress={() => onLike(item.user.uid, item.id)}
+                                />
+                            }
                             <Text
                                 onPress={() => props.navigation.navigate("Comment", 
                                             { postId: item.id, uid: item.user.uid })}
@@ -89,7 +117,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = store => ({
     currentUser: store.userState.currentUser,
     following: store.userState.following,
-    users: store.usersState.users,
+    feed: store.usersState.feed,
     usersFollowingLoaded: store.usersState.usersFollowingLoaded
 })
 

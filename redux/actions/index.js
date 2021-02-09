@@ -1,4 +1,4 @@
-import { USER_POSTS_STATE_CHANGE, USER_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE, USERS_POSTS_STATE_CHANGE, CLEAR_DATA } from "../constants"
+import { USER_POSTS_STATE_CHANGE, USER_STATE_CHANGE, USER_FOLLOWING_STATE_CHANGE, USERS_DATA_STATE_CHANGE, USERS_POSTS_STATE_CHANGE, CLEAR_DATA, USERS_LIKES_STATE_CHANGE } from "../constants"
 import firebase from "firebase"
 require("firebase/firestore")
 
@@ -79,13 +79,7 @@ export function fetchUserFollowing() {
 export function fetchUsersData(uid, getPosts) {
     return((dispatch, getState) => {
 
-        console.log(`wtf right now ${uid}`)
         const found = getState().usersState.users.some(el => el.uid === uid);
-
-        uid === undefined ?
-        console.log("undefined within fetchUsersData")
-        :
-        console.log(`barnacles ${uid}`)
 
         if(!found) {
             firebase.firestore()
@@ -119,7 +113,6 @@ export function fetchUsersFollowingPosts(uid) {
                 .then(snapshot => {
 
                     const uid = snapshot.query._.C_.Ft.path.segments[1]
-
                     const user = getState().usersState.users.find(el => el.uid === uid);
 
                     let posts = snapshot.docs.map(doc => {
@@ -127,13 +120,44 @@ export function fetchUsersFollowingPosts(uid) {
                         const id = doc.id;
                         return { id, ...data, user }
                     })
-                    console.log("should have exposed")
-                    // console.log(posts)
+
+                    posts.forEach(post => {
+                        dispatch(fetchUserFollowingLikes(uid, post.id))
+                    })
                     dispatch(
                         { 
                             type: USERS_POSTS_STATE_CHANGE,
                             posts,
                             uid
+                        }
+                    )
+                })
+    })
+}
+
+export function fetchUserFollowingLikes(uid, postId) {
+    return ((dispatch, getState) => {
+        firebase.firestore()
+                .collection("posts")
+                .doc(uid)
+                .collection("userPosts")
+                .doc(postId)
+                .collection("likes")
+                .doc(firebase.auth().currentUser.uid)
+                .onSnapshot(snapshot => {
+
+                    const postId = snapshot._.S_.path.segments[3]
+
+                    let currentUserLike = false
+                    if(snapshot.exists) {
+                        currentUserLike = true
+                    }
+
+                    dispatch(
+                        { 
+                            type: USERS_LIKES_STATE_CHANGE,
+                            postId,
+                            currentUserLike
                         }
                     )
                 })
