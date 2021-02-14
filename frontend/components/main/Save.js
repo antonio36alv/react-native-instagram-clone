@@ -51,6 +51,7 @@ export default function Save(props) {
                     .add({
                         snapshotURL,
                         caption,
+			likesCount: 0,
                         creation: firebase
                                     .firestore
                                     .FieldValue
